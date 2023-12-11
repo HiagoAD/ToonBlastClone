@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b29a9534ec33f4aeba99e384f4b40d98, type: 3}
+  m_Name: Game Configs
+  m_EditorClassIdentifier: 
+  levels:
+  - {fileID: 11400000, guid: d1be75d0f9c0c4d0bb7a25e95ec2a0de, type: 2}
+  - {fileID: 11400000, guid: ae0a95da47a234a7e97ab35c6ffa70e4, type: 2}
+  - {fileID: 11400000, guid: 2914eec5ae6b24a88ab27e88528fecb9, type: 2}
+  - {fileID: 11400000, guid: 0de36d36957d24fb1937b29c9d1f7a21, type: 2}
+  - {fileID: 11400000, guid: da1b3621ce0b941bfafdd5fc663e6c9b, type: 2}
+  animationSpeed: 5
+  tileSize: 1
+  padding: {x: 0.1, y: 0.1}
