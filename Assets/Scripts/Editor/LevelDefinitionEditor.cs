@@ -39,10 +39,10 @@ public class LevelDefinitionEditor : Editor
         if (def.Validate())
         {
             int pixelSize = 50;
-            Vector2Int textureSize = (new Vector2Int(def.gridSize.x, (def.layout.Count / def.gridSize.x) + 1) * (pixelSize + 1)) + Vector2Int.one;
+            Vector2Int textureSize = (new Vector2Int(def.gridSize.x, (def.Layout.Count / def.gridSize.x) + 1) * (pixelSize + 1)) + Vector2Int.one;
             var texture = new Texture2D(textureSize.x, textureSize.y);
 
-            for (int i, j, n = 0; n < def.layout.Count; n++)
+            for (int i, j, n = 0; n < def.Layout.Count; n++)
             {
                 i = n / def.gridSize.x;
                 j = n % def.gridSize.x;
@@ -55,8 +55,8 @@ public class LevelDefinitionEditor : Editor
                     }
                 }
 
-                if(i < def.gridSize.y) texture.SetPixels(j* (pixelSize + 1) + 1, i * (pixelSize + 1) + 1, pixelSize, pixelSize, Enumerable.Repeat(def.layout[n].ToColor(), pixelSize * pixelSize).ToArray());
-                else texture.SetPixels(j* (pixelSize + 1) + 1, (i + 1) * (pixelSize + 1) + 1, pixelSize, pixelSize, Enumerable.Repeat(def.layout[n].ToColor(), pixelSize * pixelSize).ToArray());
+                if(i < def.gridSize.y) texture.SetPixels(j* (pixelSize + 1) + 1, i * (pixelSize + 1) + 1, pixelSize, pixelSize, Enumerable.Repeat(def.Layout[n].ToColor(), pixelSize * pixelSize).ToArray());
+                else texture.SetPixels(j* (pixelSize + 1) + 1, (i + 1) * (pixelSize + 1) + 1, pixelSize, pixelSize, Enumerable.Repeat(def.Layout[n].ToColor(), pixelSize * pixelSize).ToArray());
             }
 
             texture.Apply();

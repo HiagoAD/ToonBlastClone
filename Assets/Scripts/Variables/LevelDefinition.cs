@@ -12,7 +12,7 @@ public class LevelDefinition : ScriptableObject
     [Multiline(20)] public string textLayout;
 
     private List<Tile.Type> _layout;
-    public List<Tile.Type> layout
+    public List<Tile.Type> Layout
     {
         get
         {
@@ -84,7 +84,6 @@ public class LevelDefinition : ScriptableObject
             }
         }
         _layout.InsertRange(0, _temp);
-        DumpMap();
 
 #if UNITY_EDITOR
         EditorUtility.SetDirty(this);
@@ -92,18 +91,8 @@ public class LevelDefinition : ScriptableObject
 #endif
     }
 
-    void DumpMap()
-    {
-        var txt = "";
-        foreach(var item in _layout)
-        {
-            txt += item;
-        }
-        Debug.Log(txt);
-    }
-
     public bool Validate()
     {
-        return layout.Count % gridSize.x == 0 && layout.Count / gridSize.x >= gridSize.y;
+        return Layout.Count % gridSize.x == 0 && Layout.Count / gridSize.x >= gridSize.y;
     }
 }

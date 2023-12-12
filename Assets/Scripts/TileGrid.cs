@@ -10,7 +10,7 @@ public class TileGrid : MonoBehaviour
 {
     public delegate Vector3 FromTilePositionToLocalPositionConverter(Vector2Int position);
 
-    [SerializeField] List<Tile> tilesPrefabs;
+    [SerializeField] Tile[] tilesPrefabs;
     [SerializeField] SpriteMask mask;
 
     float tileSize => GameManager.Instance.TileSize;
@@ -35,7 +35,7 @@ public class TileGrid : MonoBehaviour
 
         grid = new Tile[Math.Max(layout.Count, visibleGridSize.x * visibleGridSize.y * 2)]; // The grid will always have, at least, twice the visible size instantiated. If the layout is bigger, will use the layout's size.
 
-        for (int i = 0; i < tilesPrefabs.Count; i++)
+        for (int i = 0; i < tilesPrefabs.Length; i++)
         {
             prefabCache[tilesPrefabs[i].type] = tilesPrefabs[i];
             availablePool[tilesPrefabs[i].type] = new();
@@ -209,7 +209,7 @@ public class TileGrid : MonoBehaviour
     /// <returns>The instantiated tile</returns>
     private Tile Spawn(Tile.Type? tileType = null)
     {
-        Tile.Type type = tileType ?? tilesPrefabs[rnd.Next(tilesPrefabs.Count)].type;
+        Tile.Type type = tileType ?? tilesPrefabs[rnd.Next(tilesPrefabs.Length)].type;
 
         if (availablePool[type].Count > 0)
         {

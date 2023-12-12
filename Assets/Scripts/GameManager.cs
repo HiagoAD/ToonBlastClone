@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TileGrid gridPrefab;
     [SerializeField] GameConfigs configs;
-    [SerializeField] Button dumpButton;
 
     public float AnimationSpeed { get { return configs.animationSpeed; } }
     public float TileSize { get { return configs.tileSize; } }
