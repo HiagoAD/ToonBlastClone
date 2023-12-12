@@ -27,7 +27,7 @@ public class TileGrid : MonoBehaviour
 
     public void Init(LevelDefinition def)
     {
-        var layout = def.layout;
+        var layout = def.Layout;
         visibleGridSize = def.gridSize;
 
         mask.transform.localScale = new Vector3(visibleGridSize.x * (tileSize + padding.x), visibleGridSize.y * (tileSize + padding.y), 0);
@@ -46,11 +46,9 @@ public class TileGrid : MonoBehaviour
             i = n / def.gridSize.x;
             j = n % def.gridSize.x;
 
-            Tile instance = n < layout.Count ? Spawn(layout[n]) : Spawn();
+            Tile instance = n < layout.Count ? Spawn(layout[n]) : Spawn(); // If there is a layout, use it, if not, grab a random one
 
-            Tile bottomInstance = j < def.gridSize.x ? null : grid[j - def.gridSize.x];
-
-            instance.Init(bottomInstance);
+            instance.Init();
             instance.GoTo(j, visibleGridSize.y + i, true);
             instance.GoTo(j, i);
 
@@ -74,8 +72,7 @@ public class TileGrid : MonoBehaviour
     {
         if (movingTiles.Count > 0) return;
 
-        KillNeibourTiles(tile);
-        ReSapwn();
+        ReSpawn(KillNeibourTiles(tile));
 
         string msg = "";
         int amount = 0;
@@ -94,10 +91,12 @@ public class TileGrid : MonoBehaviour
     /// If no neighbour tile of the same type is found, the original tile is not killed
     /// </summary>
     /// <param name="tile">The tile that the BFS will start from</param>
-    private void KillNeibourTiles(Tile tile)
+    /// <returns>A dictionary of ints where the key is the column index, and the value, the lowest deleted tile's index</returns>
+    private Dictionary<int, int> KillNeibourTiles(Tile tile)
     {
         var typeToDelete = tile.type;
         List<Tile> toDelete = new() { tile };
+        Dictionary<int, int> deleted = new();
 
         bool firstRun = true;
         Tile current;
@@ -135,31 +134,51 @@ public class TileGrid : MonoBehaviour
 
             if (!(firstRun && toDelete.Count == 0))
             {
+                if(deleted.TryGetValue(current.TilePosition.x, out int value))
+                {
+                    deleted[current.TilePosition.x] = Math.Min(value, current.TilePosition.y);
+                }
+                else
+                {
+                    deleted[current.TilePosition.x] = current.TilePosition.y;
+                }
                 current.Kill();
+                current.transform.position = new Vector3(-10, 0, 0);
             }
 
             firstRun = false;
         }
+
+        return deleted;
     }
 
-    private void ReSapwn()
+/// <summary>
+/// Receives the return from KillNeibourTiles to realocate alive tiles to free spaces, and spawn new tiles to fill the blanks
+/// </summary>
+/// <param name="deleted">A dictionary of ints where the key is the column index, and the value, the lowest deleted tile's index</param>
+    private void ReSpawn(Dictionary<int, int> deleted)
     {
-        for (int j = 0; j < visibleGridSize.x; j++)
+        foreach(var touple in deleted)
         {
+            int j = touple.Key;
+
             int toSpawn = 0;
-            Tile highest = null;
+            Tile highest = touple.Value > 0 ? grid[((touple.Value - 1) * visibleGridSize.x) + j] : null;
             Tile current;
-            for (int i = 0; i < grid.Length / visibleGridSize.x; i++)
+            for (int i = touple.Value; i < grid.Length / visibleGridSize.x; i++)
             {
                 current = grid[(i * visibleGridSize.x) + j];
                 if (current.Alive)
                 {
-                    current.SetNewBottomTile(highest);
+                    int y = highest != null ? highest.TilePosition.y + 1 : 0;
 
-                    grid[(current.TilePosition.y * visibleGridSize.x) + j] = current;
+                    bool visible = y < visibleGridSize.y;
+                    current.GoTo(j, y, !visible);
+                    current.gameObject.SetActive(visible);
+
+                    grid[(y * visibleGridSize.x) + j] = current;
 
                     highest = current;
-                    current.gameObject.SetActive(current.TilePosition.y < visibleGridSize.y);
                 }
                 else
                 {
@@ -171,7 +190,7 @@ public class TileGrid : MonoBehaviour
             for (; toSpawn > 0; toSpawn--)
             {
                 Tile instance = Spawn();
-                instance.Init(highest);
+                instance.Init();
                 instance.GoTo(j, highest.TilePosition.y + 1, true);
 
 
