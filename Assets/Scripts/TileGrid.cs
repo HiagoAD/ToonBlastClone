@@ -72,17 +72,15 @@ public class TileGrid : MonoBehaviour
     {
         if (movingTiles.Count > 0) return;
 
-        ReSpawn(KillNeibourTiles(tile));
-
-        string msg = "";
-        int amount = 0;
-        foreach (var entry in availablePool)
+        var killed = KillNeibourTiles(tile);
+        if(killed[-1] > 0)
         {
-            msg += $"{entry.Key} - {entry.Value.Count} /// ";
-            amount += entry.Value.Count;
+            int totalDeletedAmount = killed[-1];
+            GameManager.Instance.OnTilesRemoved(totalDeletedAmount);
+
+            killed.Remove(-1);
+            ReSpawn(killed);
         }
-        msg += $"Total: {grid.Length + amount}";
-        Debug.Log(msg);
     }
 
 
@@ -91,23 +89,24 @@ public class TileGrid : MonoBehaviour
     /// If no neighbour tile of the same type is found, the original tile is not killed
     /// </summary>
     /// <param name="tile">The tile that the BFS will start from</param>
-    /// <returns>A dictionary of ints where the key is the column index, and the value, the lowest deleted tile's index</returns>
+    /// <returns>A dictionary of ints where the key is the column index, and the value, the lowest deleted tile's index. Key -1 has the total amount of deleted tiles</returns>
     private Dictionary<int, int> KillNeibourTiles(Tile tile)
     {
         var typeToDelete = tile.type;
-        List<Tile> toDelete = new() { tile };
-        Dictionary<int, int> deleted = new();
+        List<Tile> toKill = new() { tile };
+        Dictionary<int, int> killed = new();
 
         bool firstRun = true;
         Tile current;
         int? up, down, left, right;
-        while (toDelete.Count > 0)
+        int total = 0;
+        while (toKill.Count > 0)
         {
-            current = toDelete[0];
+            current = toKill[0];
 
             if (!current.Alive)
             {
-                toDelete.Remove(current);
+                toKill.Remove(current);
                 continue;
             }
 
@@ -118,47 +117,49 @@ public class TileGrid : MonoBehaviour
 
 
             if (up.HasValue && grid[up.Value].Alive && grid[up.Value].type == typeToDelete)
-                toDelete.Add(grid[up.Value]);
+                toKill.Add(grid[up.Value]);
 
             if (down.HasValue && grid[down.Value].Alive && grid[down.Value].type == typeToDelete)
-                toDelete.Add(grid[down.Value]);
+                toKill.Add(grid[down.Value]);
 
             if (right.HasValue && grid[right.Value].Alive && grid[right.Value].type == typeToDelete)
-                toDelete.Add(grid[right.Value]);
+                toKill.Add(grid[right.Value]);
 
             if (left.HasValue && grid[left.Value].Alive && grid[left.Value].type == typeToDelete)
-                toDelete.Add(grid[left.Value]);
+                toKill.Add(grid[left.Value]);
 
 
-            toDelete.Remove(current);
+            toKill.Remove(current);
 
-            if (!(firstRun && toDelete.Count == 0))
+            if (!(firstRun && toKill.Count == 0))
             {
-                if(deleted.TryGetValue(current.TilePosition.x, out int value))
+                if(killed.TryGetValue(current.TilePosition.x, out int value))
                 {
-                    deleted[current.TilePosition.x] = Math.Min(value, current.TilePosition.y);
+                    killed[current.TilePosition.x] = Math.Min(value, current.TilePosition.y);
                 }
                 else
                 {
-                    deleted[current.TilePosition.x] = current.TilePosition.y;
+                    killed[current.TilePosition.x] = current.TilePosition.y;
                 }
                 current.Kill();
                 current.transform.position = new Vector3(-10, 0, 0);
+                total++;
             }
 
             firstRun = false;
         }
 
-        return deleted;
+        killed[-1] = total;
+        return killed;
     }
 
 /// <summary>
 /// Receives the return from KillNeibourTiles to realocate alive tiles to free spaces, and spawn new tiles to fill the blanks
 /// </summary>
-/// <param name="deleted">A dictionary of ints where the key is the column index, and the value, the lowest deleted tile's index</param>
-    private void ReSpawn(Dictionary<int, int> deleted)
+/// <param name="killed">A dictionary of ints where the key is the column index, and the value, the lowest killed tile's index</param>
+    private void ReSpawn(Dictionary<int, int> killed)
     {
-        foreach(var touple in deleted)
+        foreach(var touple in killed)
         {
             int j = touple.Key;
 

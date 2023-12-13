@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee9df89aadb794f63ac9cf33e7f683d9, type: 3}
   m_Name: level_1
   m_EditorClassIdentifier: 
+  lives: 30
+  goal: 30
+  scorePerStar: 0a0000001900000032000000
   gridSize: {x: 5, y: 5}
   textLayout: 'GYGYG
 

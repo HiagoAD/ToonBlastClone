@@ -8,6 +8,9 @@ using System.Linq;
 [CreateAssetMenu(fileName = "level_x", menuName = "Levels/Level Asset")]
 public class LevelDefinition : ScriptableObject
 {
+    [Min(0)] public int lives;
+    [Min(0)] public int goal;
+    [Min(0)] public int[] scorePerStar = new int[3];
     public Vector2Int gridSize;
     [Multiline(20)] public string textLayout;
 

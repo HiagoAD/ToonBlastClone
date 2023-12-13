@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using System;
 
 [CustomEditor(typeof(LevelDefinition))]
 public class LevelDefinitionEditor : Editor
@@ -19,6 +20,10 @@ public class LevelDefinitionEditor : Editor
 
         DrawDefaultInspector();
 
+        if(def.scorePerStar.Length != 3)
+        {
+            Array.Resize(ref def.scorePerStar, 3);
+        }
 
         if (def.gridSize.x < 5) def.gridSize.x = 5;
         else if (def.gridSize.x > 9) def.gridSize.x = 9;
